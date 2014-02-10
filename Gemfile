@@ -15,6 +15,8 @@ gem 'haml'
 gem 'rugged'
 
 group :test, :development do
+  gem "rspec"
+
   gem "guard-sprockets2"
   gem "rake"
   gem "rack-livereload"
