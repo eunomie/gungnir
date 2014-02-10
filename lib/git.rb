@@ -23,7 +23,7 @@ module Git
         item = YAML.load content
         result.push item
       end
-      result
+      result.sort { |a, b| b["time"] <=> a["time"] }
     end
 
     def mark_as_done id
