@@ -43,6 +43,10 @@ module Git
       write(item.to_yaml, id, "mark as done")
     end
 
+    def delete (id, message)
+      commit(remove(id), message)
+    end
+
     private
 
     def blob(content)
@@ -52,6 +56,12 @@ module Git
     def tree(oid, path)
       index = @repo.index
       index.add(:path => path, :oid => oid, :mode => 0100644)
+      index.write_tree(@repo)
+    end
+
+    def remove(path)
+      index = @repo.index
+      index.remove(path)
       index.write_tree(@repo)
     end
 

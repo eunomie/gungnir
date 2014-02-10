@@ -23,6 +23,11 @@ class App < Sinatra::Base
     redirect '/'
   end
 
+  get '/delete/:id' do
+    repo.delete params[:id], "remove a todo"
+    redirect '/'
+  end
+
   get '/new' do
     @title = "Add todo list"
     haml :new
