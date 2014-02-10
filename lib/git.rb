@@ -46,15 +46,13 @@ module Git
     end
 
     def tree(oid, path)
-      index = @index
-      index.add(:path => path, :oid => oid, :mode => 0100644)
-      index.write_tree(@repo)
+      @index.add(:path => path, :oid => oid, :mode => 0100644)
+      @index.write_tree(@repo)
     end
 
     def remove(path)
-      index = @index
-      index.remove(path)
-      index.write_tree(@repo)
+      @index.remove(path)
+      @index.write_tree(@repo)
     end
 
     def commit(tree, message)
