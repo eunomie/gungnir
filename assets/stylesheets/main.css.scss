@@ -1,5 +1,8 @@
-// write your amazing style here!
+body {
+  padding-top: 60px;
+}
 
-h1 {
-  text-align: center;
+#todo-list li {
+  border-bottom: 1px solid #333333;
+  padding: 15px 0;
 }

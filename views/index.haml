@@ -1,2 +1,18 @@
-
+%ul#todo-list.list-unstyled
+  - @items.each do |item|
+    %li{:id => item.id}
+      %span.item
+        - if item.done?
+          %del
+            = item.content
+        - else
+          = item.content
+      %span.pull-right
+        %a.btn.done{:href => '#'}
+          - if item.done?
+            Not done
+          - else
+            Done
+        %a.btn.btn-danger{:href => "/delete/#{item.id}"} Delete
+%a.btn.btn-primary{:href => "/new"} Add todo item
 

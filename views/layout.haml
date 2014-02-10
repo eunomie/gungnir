@@ -7,5 +7,11 @@
     /[if lt IE 9]
       %script{src:javascript_path("html5shiv/dist/html5shiv")}
   %body
-    =yield
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          %a.navbar-brand{:href => "/"} Todo list
+    .container
+      %h1= @title
+      =yield
     %script{src:javascript_path("application")}
