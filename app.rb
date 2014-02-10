@@ -14,13 +14,13 @@ class App < Sinatra::Base
   repo = Git::Repo.new(REPO_PATH)
   gungnir = Gungnir.new(repo)
 
-  get '/done/:id' do
-    gungnir.mark_as_done params[:id]
+  get '/done/:id' do |id|
+    gungnir.mark_as_done id
     redirect '/'
   end
 
-  get '/delete/:id' do
-    gungnir.delete params[:id]
+  get '/delete/:id' do |id|
+    gungnir.delete id
     redirect '/'
   end
 
@@ -35,11 +35,11 @@ class App < Sinatra::Base
     redirect '/'
   end
 
-  get '/:hash?' do
-    @items = gungnir.all params[:hash]
-    @current = params[:hash] || 'master'
-    @prev = repo.prev params[:hash]
-    @next = repo.next params[:hash]
+  get '/:hash?' do |hash|
+    @items = gungnir.all hash
+    @current = hash || 'master'
+    @prev = repo.prev hash
+    @next = repo.next hash
     redirect '/new' if @items.empty?
     haml :index
   end
