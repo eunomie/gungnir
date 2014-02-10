@@ -27,7 +27,7 @@ module Git
     def mark_as_done id
       obj = get(id)
       return if obj == nil
-      item = YAML.load @repo.read(obj).data
+      item = YAML.load obj
       item["done"] = true
       write(item.to_yaml, id, "mark as done")
     end
@@ -65,6 +65,12 @@ module Git
     end
 
     def get path
+      obj = oid path
+      return nil if obj == nil
+      @repo.read(obj).data
+    end
+
+    def oid path
       return nil if @repo.empty?
       tree = @repo.lookup(@repo.head.target).tree
       obj = nil
