@@ -8,13 +8,10 @@ class Item
   attr_accessor :id
   attr_accessor :content
 
-  @@id = 0
-
   @@items = []
 
   def initialize(content, time)
-    @id = @@id
-    @@id = @@id + 1
+    @id = SecureRandom.uuid
     @content = content
     @done = false
     @time = time
