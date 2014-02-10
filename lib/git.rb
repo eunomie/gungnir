@@ -72,7 +72,7 @@ module Git
       tree = @repo.lookup(@repo.head.target).tree
       obj = nil
       tree.walk_blobs(:postorder) do |root, entry|
-        if entry[:name] == path
+        if "#{root}#{entry[:name]}" == path
           obj = entry[:oid]
           break
         end
