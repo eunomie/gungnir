@@ -6,12 +6,12 @@ class Gungnir
   end
 
   def create content
-    @repo.write(content.to_yaml, format(content["id"]), "add a todo")
+    @repo.write(content.to_yaml, format(content["id"]), "plop add a todo")
   end
 
-  def all
+  def all version = nil
     result = []
-    oids = @repo.get_all
+    oids = @repo.get_all version
     oids.each do |obj|
       result.push YAML.load obj
     end

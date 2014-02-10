@@ -24,12 +24,37 @@ module Git
       @repo.read(obj).data
     end
 
-    def get_all
+    def get_all rev = nil
       result = []
-      get_oids.each do |oid|
+      get_oids(rev).each do |oid|
         result.push @repo.read(oid).data
       end
       result
+    end
+
+    def prev rev = nil
+      hash = rev || @repo.head.target
+      tree = @repo.lookup hash
+      parent = tree.parents.first
+      parent != nil ? parent.oid : nil
+    end
+
+    def next rev = nil
+      return nil if rev == nil
+      return nil if rev == repo.head.target
+      walker = Rugged::Walker.new @repo
+      walker.push repo.head.target
+      version = nil
+      walker.each do |c|
+        if c.oid == rev
+          break
+        end
+        version = c.oid
+      end
+      if version == repo.head.target
+        version = ''
+      end
+      version
     end
 
     private
@@ -73,10 +98,11 @@ module Git
       obj
     end
 
-    def get_oids
+    def get_oids rev = nil
       result = []
       return result if @repo.empty?
-      tree = @repo.lookup(@repo.head.target).tree
+      hash = rev || @repo.head.target
+      tree = @repo.lookup(hash).tree
       tree.walk_blobs(:postorder) do |root, entry|
         result.push(entry[:oid])
       end

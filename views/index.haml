@@ -1,3 +1,15 @@
+.row
+  .col-xs-1
+    - if @prev
+      %a.btn{:href => "/#{@prev}"} < Previous
+  .col-xs-6.col-xs-offset-2
+    - if @current != 'master'
+      Playback at
+      = @current
+  .col-xs-1.col-xs-offset-2
+    - if @next
+      %a.btn{:href => "/#{@next}"} Next >
+
 %ul#todo-list.list-unstyled
   - @items.each do |item|
     %li{:id => item["id"]}
@@ -7,10 +19,11 @@
             = item["content"]
         - else
           = item["content"]
-      %span.pull-right
-        - if item["done"] == false
-          %a.btn.done{:href => "/done/#{item["id"]}"}
-            Done
-        %a.btn.btn-danger{:href => "/delete/#{item["id"]}"} Delete
-%a.btn.btn-primary{:href => "/new"} Add todo item
-
+      - if @current == 'master'
+        %span.pull-right
+          - if item["done"] == false
+            %a.btn.done{:href => "/done/#{item["id"]}"}
+              Done
+          %a.btn.btn-danger{:href => "/delete/#{item["id"]}"} Delete
+- if @current == 'master'
+  %a.btn.btn-primary{:href => "/new"} Add todo item

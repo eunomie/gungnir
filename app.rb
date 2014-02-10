@@ -14,12 +14,6 @@ class App < Sinatra::Base
   repo = Git::Repo.new(REPO_PATH)
   gungnir = Gungnir.new(repo)
 
-  get '/' do
-    @items = gungnir.all
-    redirect '/new' if @items.empty?
-    haml :index
-  end
-
   get '/done/:id' do
     gungnir.mark_as_done params[:id]
     redirect '/'
@@ -39,5 +33,14 @@ class App < Sinatra::Base
     item = {"id" => SecureRandom.uuid, "content" => params[:content], "done" => false, "time" => Time.now}
     gungnir.create(item)
     redirect '/'
+  end
+
+  get '/:hash?' do
+    @items = gungnir.all params[:hash]
+    @current = params[:hash] || 'master'
+    @prev = repo.prev params[:hash]
+    @next = repo.next params[:hash]
+    redirect '/new' if @items.empty?
+    haml :index
   end
 end
