@@ -17,13 +17,30 @@ module Git
       result = []
       return result if @repo.empty?
       head = @repo.head
-      tree = @repo.lookup(@repo.head.target).tree
+      tree = @repo.lookup(head.target).tree
       tree.walk_blobs(:postorder) do |root, entry|
         content = @repo.read(entry[:oid]).data
         item = YAML.load content
         result.push item
       end
       result
+    end
+
+    def mark_as_done id
+      return if @repo.empty?
+      head = @repo.head
+      tree = @repo.lookup(head.target).tree
+      item = nil
+      tree.walk_blobs(:postorder) do |root, entry|
+        if entry[:name] == id
+          content = @repo.read(entry[:oid]).data
+          item = YAML.load content
+          break
+        end
+      end
+      return unless item
+      item["done"] = true
+      write(item.to_yaml, id, "mark as done")
     end
 
     private

@@ -8,10 +8,8 @@
         - else
           = item["content"]
       %span.pull-right
-        %a.btn.done{:href => '#'}
-          - if item["done"]
-            Not done
-          - else
+        - if item["done"] == false
+          %a.btn.done{:href => "/done/#{item["id"]}"}
             Done
         %a.btn.btn-danger{:href => "/delete/#{item["id"]}"} Delete
 %a.btn.btn-primary{:href => "/new"} Add todo item

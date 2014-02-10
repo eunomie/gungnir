@@ -18,6 +18,11 @@ class App < Sinatra::Base
     haml :index
   end
 
+  get '/done/:id' do
+    repo.mark_as_done params[:id]
+    redirect '/'
+  end
+
   get '/new' do
     @title = "Add todo list"
     haml :new
@@ -25,7 +30,7 @@ class App < Sinatra::Base
 
   post '/new' do
     item = {"id" => SecureRandom.uuid, "content" => params[:content], "done" => false, "time" => Time.now}
-    repo.write(item.to_yaml, "items/#{item["id"]}", "add a todo")
+    repo.write(item.to_yaml, item["id"], "add a todo")
     redirect '/'
   end
 end
