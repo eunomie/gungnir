@@ -16,12 +16,9 @@ module Git
 
     def all
       result = []
-      return result if @repo.empty?
-      head = @repo.head
-      tree = @repo.lookup(head.target).tree
-      tree.walk_blobs(:postorder) do |root, entry|
-        content = @repo.read(entry[:oid]).data
-        item = YAML.load content
+      oids = get_all
+      oids.each do |oid|
+        item = YAML.load @repo.read(oid).data
         result.push item
       end
       result.sort { |a, b| b["time"] <=> a["time"] }
@@ -78,6 +75,16 @@ module Git
         end
       end
       obj
+    end
+
+    def get_all
+      result = []
+      return result if @repo.empty?
+      tree = @repo.lookup(@repo.head.target).tree
+      tree.walk_blobs(:postorder) do |root, entry|
+        result.push(entry[:oid])
+      end
+      result
     end
 
     def update_index
