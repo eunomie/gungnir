@@ -19,12 +19,12 @@ class App < Sinatra::Base
   end
 
   get '/done/:id' do
-    repo.mark_as_done params[:id]
+    repo.mark_as_done "items/#{params[:id]}"
     redirect '/'
   end
 
   get '/delete/:id' do
-    repo.delete params[:id], "remove a todo"
+    repo.delete "items/#{params[:id]}", "remove a todo"
     redirect '/'
   end
 
@@ -35,7 +35,7 @@ class App < Sinatra::Base
 
   post '/new' do
     item = {"id" => SecureRandom.uuid, "content" => params[:content], "done" => false, "time" => Time.now}
-    repo.write(item.to_yaml, item["id"], "add a todo")
+    repo.write(item.to_yaml, "items/#{item["id"]}", "add a todo")
     redirect '/'
   end
 end
