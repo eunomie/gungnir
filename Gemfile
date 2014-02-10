@@ -12,6 +12,8 @@ gem "uglifier",          "~> 2.4"
 
 gem 'haml'
 
+gem 'rugged'
+
 group :test, :development do
   gem "guard-sprockets2"
   gem "rake"

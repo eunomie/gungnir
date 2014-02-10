@@ -2,6 +2,8 @@ require "bundler"
 Bundler.require
 include Sprockets::Helpers
 
+REPO_PATH = "git-backend"
+
 class Item
   attr_accessor :id
   attr_accessor :content
@@ -37,6 +39,12 @@ end
 
 class App < Sinatra::Base
   set :sprockets, Sprockets::Environment.new(root)
+
+  if File.exists?(REPO_PATH)
+    repo = Rugged::Repository.new(REPO_PATH)
+  else
+    repo = Rugged::Repository.init_at(REPO_PATH, :bare)
+  end
 
   get '/' do
     @items = Item.all()
