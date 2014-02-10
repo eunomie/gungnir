@@ -3,6 +3,8 @@ Bundler.require
 require 'yaml'
 include Sprockets::Helpers
 
+require_relative "lib/git"
+
 REPO_PATH = "git-backend"
 
 def write(repo, content, path, message)
@@ -57,7 +59,7 @@ class Item
 
   def self.create(content, time, repo)
     item = Item.new(content, time)
-    write(repo, item.to_yaml, "items/#{item.id}", "new item")
+    repo.write(item.to_yaml, "items/#{item.id}", "add a todo")
   end
 
   def to_yaml
@@ -68,11 +70,7 @@ end
 class App < Sinatra::Base
   set :sprockets, Sprockets::Environment.new(root)
 
-  if File.exists?(REPO_PATH)
-    repo = Rugged::Repository.new(REPO_PATH)
-  else
-    repo = Rugged::Repository.init_at(REPO_PATH, :bare)
-  end
+  repo = Git::Repo.new(REPO_PATH)
 
   get '/' do
     @items = Item.all()
