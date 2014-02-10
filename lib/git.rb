@@ -13,6 +13,19 @@ module Git
       commit(tree(blob(content), path), message)
     end
 
+    def all
+      result = []
+      return result if @repo.empty?
+      head = @repo.head
+      tree = @repo.lookup(@repo.head.target).tree
+      tree.walk_blobs(:postorder) do |root, entry|
+        content = @repo.read(entry[:oid]).data
+        item = YAML.load content
+        result.push item
+      end
+      result
+    end
+
     private
 
     def blob(content)
@@ -20,7 +33,7 @@ module Git
     end
 
     def tree(oid, path)
-      index = Rugged::Index.new
+      index = @repo.index
       index.add(:path => path, :oid => oid, :mode => 0100644)
       index.write_tree(@repo)
     end
@@ -31,7 +44,7 @@ module Git
       options[:author] = { :email => "contact@sogilis.com", :name => 'sogilis', :time => Time.now }
       options[:committer] = { :email => "contact@sogilis.com", :name => 'sogilis', :time => Time.now }
       options[:message] ||= message
-      options[:parents] = repo.empty? ? [] : [ repo.head.target ].compact
+      options[:parents] = @repo.empty? ? [] : [ @repo.head.target ].compact
       options[:update_ref] = 'HEAD'
 
       Rugged::Commit.create(@repo, options)
@@ -41,7 +54,7 @@ module Git
       if File.exists?(@path)
         @repo = Rugged::Repository.new(@path)
       else
-        @repo = Rugged::Repository.init_at(@path, :bare)
+        @repo = Rugged::Repository.init_at(@path)
       end
     end
   end
