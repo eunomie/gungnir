@@ -27,18 +27,9 @@ module Git
     end
 
     def mark_as_done id
-      return if @repo.empty?
-      head = @repo.head
-      tree = @repo.lookup(head.target).tree
-      item = nil
-      tree.walk_blobs(:postorder) do |root, entry|
-        if entry[:name] == id
-          content = @repo.read(entry[:oid]).data
-          item = YAML.load content
-          break
-        end
-      end
-      return unless item
+      obj = get(id)
+      return if obj == nil
+      item = YAML.load @repo.read(obj).data
       item["done"] = true
       write(item.to_yaml, id, "mark as done")
     end
@@ -75,6 +66,19 @@ module Git
       options[:update_ref] = 'HEAD'
 
       Rugged::Commit.create(@repo, options)
+    end
+
+    def get path
+      return nil if @repo.empty?
+      tree = @repo.lookup(@repo.head.target).tree
+      obj = nil
+      tree.walk_blobs(:postorder) do |root, entry|
+        if entry[:name] == path
+          obj = entry[:oid]
+          break
+        end
+      end
+      obj
     end
 
     def create_if_not_exists
