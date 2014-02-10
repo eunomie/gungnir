@@ -4,6 +4,7 @@ require 'yaml'
 include Sprockets::Helpers
 
 require_relative "lib/git"
+require_relative "lib/gungnir"
 
 REPO_PATH = "git-backend"
 
@@ -11,20 +12,21 @@ class App < Sinatra::Base
   set :sprockets, Sprockets::Environment.new(root)
 
   repo = Git::Repo.new(REPO_PATH)
+  gungnir = Gungnir.new(repo)
 
   get '/' do
-    @items = repo.all
+    @items = gungnir.all
     redirect '/new' if @items.empty?
     haml :index
   end
 
   get '/done/:id' do
-    repo.mark_as_done "items/#{params[:id]}"
+    gungnir.mark_as_done params[:id]
     redirect '/'
   end
 
   get '/delete/:id' do
-    repo.delete "items/#{params[:id]}", "remove a todo"
+    gungnir.delete params[:id]
     redirect '/'
   end
 
@@ -35,7 +37,7 @@ class App < Sinatra::Base
 
   post '/new' do
     item = {"id" => SecureRandom.uuid, "content" => params[:content], "done" => false, "time" => Time.now}
-    repo.write(item.to_yaml, "items/#{item["id"]}", "add a todo")
+    gungnir.create(item)
     redirect '/'
   end
 end

@@ -14,25 +14,22 @@ module Git
       commit(tree(blob(content), path), message)
     end
 
-    def all
-      result = []
-      oids = get_all
-      oids.each do |obj|
-        result.push YAML.load obj
-      end
-      result.sort { |a, b| b["time"] <=> a["time"] }
-    end
-
-    def mark_as_done id
-      obj = get(id)
-      return if obj == nil
-      item = YAML.load obj
-      item["done"] = true
-      write(item.to_yaml, id, "mark as done")
-    end
-
     def delete (id, message)
       commit(remove(id), message)
+    end
+
+    def get path
+      obj = oid path
+      return nil if obj == nil
+      @repo.read(obj).data
+    end
+
+    def get_all
+      result = []
+      get_oids.each do |oid|
+        result.push @repo.read(oid).data
+      end
+      result
     end
 
     private
@@ -63,12 +60,6 @@ module Git
       Rugged::Commit.create(@repo, options)
     end
 
-    def get path
-      obj = oid path
-      return nil if obj == nil
-      @repo.read(obj).data
-    end
-
     def oid path
       return nil if @repo.empty?
       tree = @repo.lookup(@repo.head.target).tree
@@ -88,14 +79,6 @@ module Git
       tree = @repo.lookup(@repo.head.target).tree
       tree.walk_blobs(:postorder) do |root, entry|
         result.push(entry[:oid])
-      end
-      result
-    end
-
-    def get_all
-      result = []
-      get_oids.each do |oid|
-        result.push @repo.read(oid).data
       end
       result
     end
