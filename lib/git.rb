@@ -19,7 +19,7 @@ module Git
 
     def get path
       obj = oid path
-      return nil if obj == nil
+      return nil if obj.nil?
       @repo.read(obj).data
     end
 
@@ -37,19 +37,16 @@ module Git
       hash = rev || @repo.head.target
       tree = @repo.lookup hash
       parent = tree.parents.first
-      parent != nil ? parent.oid : nil
+      parent.nil? ? nil : parent.oid
     end
 
     def next rev = nil
-      return nil if rev == nil
-      return nil if rev == @repo.head.target
+      return nil if rev == nil || rev == @repo.head.target
       walker = Rugged::Walker.new @repo
       walker.push @repo.head.target
       version = nil
       walker.each do |c|
-        if c.oid == rev
-          break
-        end
+        break if c.oid == rev
         version = c.oid
       end
       if version == @repo.head.target
