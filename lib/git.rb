@@ -7,7 +7,6 @@ module Git
       @path = path
       @repo = nil
       create_if_not_exists
-      update_index
     end
 
     def write(content, path, message)
@@ -65,13 +64,15 @@ module Git
     end
 
     def tree(oid, path)
-      @index.add(:path => path, :oid => oid, :mode => 0100644)
-      @index.write_tree(@repo)
+      index = get_index
+      index.add(:path => path, :oid => oid, :mode => 0100644)
+      index.write_tree(@repo)
     end
 
     def remove(path)
-      @index.remove(path)
-      @index.write_tree(@repo)
+      index = get_index
+      index.remove(path)
+      index.write_tree(@repo)
     end
 
     def commit(tree, message)
@@ -113,13 +114,13 @@ module Git
       result
     end
 
-    def update_index
-      @index = Rugged::Index.new
-      return if @repo.empty?
-      tree = @repo.lookup(@repo.head.target).tree
-      tree.walk_blobs(:postorder) do |root, entry|
-        @index.add(:path => "#{root}#{entry[:name]}", :oid => entry[:oid], :mode => 0100644)
+    def get_index
+      index = Rugged::Index.new
+      unless @repo.empty?
+        tree = @repo.lookup(@repo.head.target).tree
+        index.read_tree tree
       end
+      index
     end
 
     def create_if_not_exists
