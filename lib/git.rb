@@ -33,6 +33,7 @@ module Git
     end
 
     def prev rev = nil
+      return nil if @repo.empty?
       hash = rev || @repo.head.target
       tree = @repo.lookup hash
       parent = tree.parents.first
@@ -41,9 +42,9 @@ module Git
 
     def next rev = nil
       return nil if rev == nil
-      return nil if rev == repo.head.target
+      return nil if rev == @repo.head.target
       walker = Rugged::Walker.new @repo
-      walker.push repo.head.target
+      walker.push @repo.head.target
       version = nil
       walker.each do |c|
         if c.oid == rev
@@ -51,7 +52,7 @@ module Git
         end
         version = c.oid
       end
-      if version == repo.head.target
+      if version == @repo.head.target
         version = ''
       end
       version
