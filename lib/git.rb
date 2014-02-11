@@ -123,7 +123,7 @@ module Git
       if File.exists?(@path)
         @repo = Rugged::Repository.new(@path)
       else
-        @repo = Rugged::Repository.init_at(@path)
+        @repo = Rugged::Repository.init_at(@path, :bare)
       end
     end
   end
