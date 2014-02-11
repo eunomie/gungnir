@@ -24,9 +24,10 @@ module Git
     end
 
     def get_all rev = nil
+      index = get_index rev
       result = []
-      get_oids(rev).each do |oid|
-        result.push @repo.read(oid).data
+      index.each do |item|
+        result.push @repo.read(item[:oid]).data
       end
       result
     end
@@ -103,21 +104,11 @@ module Git
       get_oid @repo.lookup(oid), paths
     end
 
-    def get_oids rev = nil
-      result = []
-      return result if @repo.empty?
-      hash = rev || @repo.head.target
-      tree = @repo.lookup(hash).tree
-      tree.walk_blobs(:postorder) do |root, entry|
-        result.push(entry[:oid])
-      end
-      result
-    end
-
-    def get_index
+    def get_index rev = nil
       index = Rugged::Index.new
       unless @repo.empty?
-        tree = @repo.lookup(@repo.head.target).tree
+        hash = rev || @repo.head.target
+        tree = @repo.lookup(hash).tree
         index.read_tree tree
       end
       index
