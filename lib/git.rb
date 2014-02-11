@@ -89,14 +89,17 @@ module Git
     def oid path
       return nil if @repo.empty?
       tree = @repo.lookup(@repo.head.target).tree
-      obj = nil
-      tree.walk_blobs(:postorder) do |root, entry|
-        if "#{root}#{entry[:name]}" == path
-          obj = entry[:oid]
-          break
-        end
-      end
-      obj
+      paths = path.split('/')
+      get_oid tree, paths
+    end
+
+    def get_oid tree, paths
+      key = paths.shift
+      return nil if tree[key].nil?
+      oid = tree[key][:oid]
+      return oid if paths.empty?
+      return nil if tree[key][:type] != :tree
+      get_oid @repo.lookup(oid), paths
     end
 
     def get_oids rev = nil
